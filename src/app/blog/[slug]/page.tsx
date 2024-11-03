@@ -1,38 +1,32 @@
 // src/app/blog/[slug]/page.tsx
 
-/**
- * This component renders individual blog posts
- * Features:
- * - Markdown rendering with syntax highlighting
- * - Table of contents
- * - Author information
- * - Related posts
- * - Previous/Next navigation
- * - Social share buttons
- * - Responsive layout
- */
-
+import { Metadata } from 'next';
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
 import { getProcessedBlogPost } from '@/lib/markdown';
 import { getAllBlogPosts } from '@/lib/blog-posts';
-import { notFound } from 'next/navigation';
-import Link from 'next/link';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { FaTwitter, FaLinkedin, FaFacebook } from 'react-icons/fa';
 import { FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 
+interface BlogPostProps {
+   params: Promise<{ slug: string }>;
+   searchParams: { [key: string]: string | string[] | undefined };
+}
+
 // Generate static paths for all blog posts
-export async function generateStaticParams() {
+export const generateStaticParams = async () => {
    const posts = getAllBlogPosts();
    return posts.map((post) => ({
       slug: post.slug,
    }));
-}
+};
 
 // Generate metadata for the page
-export async function generateMetadata({ params }: { params: Promise<{ slug: string }> | { slug: string } }) {
-   const resolvedParams = await Promise.resolve(params);
+export const generateMetadata = async ({ params }: BlogPostProps): Promise<Metadata> => {
+   const resolvedParams = await params;
    const post = await getProcessedBlogPost(resolvedParams.slug);
 
    if (!post) {
@@ -47,10 +41,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       authors: [{ name: post.author.name }],
       keywords: post.tags,
    };
-}
+};
 
-export default async function BlogPost({ params }: { params: Promise<{ slug: string }> | { slug: string } }) {
-   const resolvedParams = await Promise.resolve(params);
+// Main page component
+const BlogPost = async ({ params }: BlogPostProps) => {
+   const resolvedParams = await params;
    const post = await getProcessedBlogPost(resolvedParams.slug);
 
    if (!post) {
@@ -181,4 +176,6 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
          </article>
       </div>
    );
-}
+};
+
+export default BlogPost;

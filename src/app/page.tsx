@@ -1,26 +1,12 @@
-// src/app/page.tsx
-
-/**
- * Home page component for the blog
- * Features:
- * - Hero section with blog introduction
- * - Featured/latest blog posts
- * - Navigation to other sections
- * - GitHub profile link
- * - Responsive layout
- *
- * This component fetches blog posts from markdown files
- * and displays them in a grid layout using shadcn/ui components
- */
-
 import Link from 'next/link';
 import { getAllBlogPosts } from '@/lib/blog-posts';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { FaGithub } from 'react-icons/fa';
+import { ModeToggle } from '@/components/custom/features/theme/ModeToggle';
 
 // Configuration
-const GITHUB_HANDLE = 'your-github-handle';
+const GITHUB_HANDLE = 'devharshthakur';
 const LATEST_POSTS_LIMIT = 3;
 
 export default function BlogHome() {
@@ -30,63 +16,73 @@ export default function BlogHome() {
    return (
       <div className="min-h-screen bg-background">
          {/* Header */}
-         <header className="border-b">
+         <header className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <div className="container mx-auto flex items-center justify-between px-4 py-4">
-               <Link href="/" className="text-2xl font-bold">
-                  My Blog
+               <Link href="/" className="text-2xl font-bold text-primary transition-colors hover:text-primary/80">
+                  devharshthakur.in blogs
                </Link>
                <nav className="flex items-center gap-4">
-                  <Button asChild variant="outline">
-                     <Link href="/blog">Blog</Link>
-                  </Button>
-                  <Button asChild variant="outline">
+                  <Button asChild variant="ghost" className="text-base">
                      <Link href="/about">About</Link>
                   </Button>
-                  <Button asChild variant="outline">
-                     <Link href="/contact">Contact</Link>
-                  </Button>
-                  <Button asChild variant="outline" size="icon">
+                  <Button asChild variant="outline" size="icon" className="rounded-full">
                      <Link href={`https://github.com/${GITHUB_HANDLE}`} target="_blank" rel="noopener noreferrer">
                         <FaGithub className="h-5 w-5" />
                         <span className="sr-only">GitHub</span>
                      </Link>
                   </Button>
+                  <ModeToggle />
                </nav>
             </div>
          </header>
 
          {/* Main Content */}
-         <main className="container mx-auto flex min-h-[calc(100vh-73px)] flex-col items-center justify-center px-4 py-12">
+         <main className="container mx-auto flex min-h-[calc(100vh-73px)] flex-col items-center justify-center px-4 py-16">
             {/* Hero Section */}
-            <section className="mb-16 max-w-2xl text-center">
-               <h1 className="mb-6 text-4xl font-bold">Welcome to My Blog</h1>
-               <p className="mb-8 text-xl text-muted-foreground">
-                  Explore my thoughts on web development, design, and more.
+            <section className="mb-24 max-w-4xl text-center">
+               <h1 className="mb-6 bg-gradient-to-r from-primary to-primary-foreground bg-clip-text text-5xl font-extrabold tracking-tight">
+                  Welcome to My Blog
+               </h1>
+               <p className="mb-12 text-xl leading-relaxed text-muted-foreground">
+                  Explore my thoughts on web development, design, and more. Dive into a world of tech insights and
+                  creative solutions.
                </p>
+               <Button asChild size="lg" className="rounded-full px-8 py-6 text-lg font-semibold">
+                  <Link href="/blog">Explore All Posts</Link>
+               </Button>
             </section>
 
             {/* Latest Posts Section */}
-            <section className="w-full max-w-4xl">
-               <h2 className="mb-8 text-center text-2xl font-semibold">Latest Posts</h2>
-               <div className="grid w-full gap-8 md:grid-cols-2 lg:grid-cols-3">
+            <section className="w-full max-w-6xl">
+               <h2 className="mb-12 text-center text-3xl font-bold text-secondary-foreground">Latest Posts</h2>
+               <div className="grid w-full gap-12 md:grid-cols-2">
                   {latestPosts.map((post) => (
-                     <Card key={post.slug} className="flex flex-col">
-                        <CardHeader>
-                           <CardTitle className="line-clamp-2">{post.title}</CardTitle>
+                     <Card
+                        key={post.slug}
+                        className="mx-auto flex w-full max-w-[600px] flex-col overflow-hidden transition-all duration-300 hover:shadow-lg"
+                     >
+                        <CardHeader className="bg-primary/5 p-6">
+                           <CardTitle className="line-clamp-2 text-2xl font-semibold text-primary">
+                              {post.title}
+                           </CardTitle>
                         </CardHeader>
-                        <CardContent>
-                           <p className="line-clamp-3 text-muted-foreground">{post.excerpt}</p>
+                        <CardContent className="p-6">
+                           <p className="line-clamp-3 text-lg text-muted-foreground">{post.excerpt}</p>
                         </CardContent>
-                        <CardFooter className="mt-auto flex justify-between">
-                           <Button asChild variant="default">
+                        <CardFooter className="mt-auto flex items-center justify-between bg-secondary/5 p-6">
+                           <Button asChild variant="default" size="lg" className="rounded-full">
                               <Link href={`/blog/${post.slug}`}>Read More</Link>
                            </Button>
                            <div className="flex flex-col items-end">
-                              <span className="text-sm text-muted-foreground">
-                                 {new Date(post.date).toLocaleDateString()}
+                              <span className="text-sm font-medium text-muted-foreground">
+                                 {new Date(post.date).toLocaleDateString('en-US', {
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric',
+                                 })}
                               </span>
                               {post.readingTime && (
-                                 <span className="text-xs text-muted-foreground">{post.readingTime}</span>
+                                 <span className="mt-1 text-xs text-muted-foreground">{post.readingTime}</span>
                               )}
                            </div>
                         </CardFooter>
@@ -95,8 +91,8 @@ export default function BlogHome() {
                </div>
 
                {/* View More Button */}
-               <div className="mt-12 text-center">
-                  <Button asChild size="lg">
+               <div className="mt-16 text-center">
+                  <Button asChild size="lg" variant="outline" className="rounded-full px-8 py-6 text-lg font-semibold">
                      <Link href="/blog">View All Posts</Link>
                   </Button>
                </div>
